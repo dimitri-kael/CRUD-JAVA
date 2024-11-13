@@ -3,15 +3,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * @author estevaolins
  * Classe responsável pela conexão com o banco de dados MySQL.
  * Fornece métodos para estabelecer e fechar a conexão.
+ * @author estevaolins
  */
 public class DB {
 
-    private final String url = "jdbc:mysql://localhost:3307/catolica";
-    private final String usuario = "root";
-    private final String senha = System.getenv("DB_PASSWORD"); // Usando variável de ambiente
+    private final String url = "jdbc:mysql://localhost:3306/ecommerce";
+    private final String usuario = "root"; // digite o username do seu BD
+    private final String senha = "digiteSuaSenhaAqui"; // digite a senha do seu DB
 
     /**
      * Estabelece uma conexão com o banco de dados MySQL.
@@ -23,13 +23,13 @@ public class DB {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, usuario, senha);
-            System.out.println("Conexão estabelecida com sucesso!");
+            System.out.println("<<<<<Conexão estabelecida com sucesso!>>>>>");
             return connection;
         } catch (ClassNotFoundException e) {
-            System.out.println("Driver não encontrado: " + e.getMessage());
+            System.out.println("##### Driver não encontrado: " + e.getMessage() + " #####");
             throw new SQLException("Erro ao carregar o driver de conexão", e);
         } catch (SQLException e) {
-            System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
+            System.out.println("##### Erro ao conectar ao banco de dados: " + e.getMessage() + " #####");
             throw e; // Propaga a exceção para tratamento em outros níveis
         }
     }
@@ -44,9 +44,9 @@ public class DB {
         if (connection != null) {
             try {
                 connection.close();
-                System.out.println("Conexão fechada.");
+                System.out.println("<<<<<Conexão fechada>>>>>");
             } catch (SQLException e) {
-                System.out.println("Erro ao fechar a conexão: " + e.getMessage());
+                System.out.println("##### Erro ao fechar a conexão: " + e.getMessage() + " #####");
             }
         }
     }
