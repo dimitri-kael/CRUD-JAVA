@@ -5,9 +5,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 /**
- * @author dimitriKael
  * Classe CRUD genérica para manipular registros em tabelas de um banco de dados MySQL.
  * Opera em qualquer tabela, desde que as colunas sejam especificadas.
+ * @author dimitriKael
  */
 public class CRUD {
 
@@ -30,7 +30,7 @@ public class CRUD {
      */
     public void insert(String[] colunas, String[] valores) {
         if (colunas.length != valores.length) {
-            System.err.println("Número de colunas e valores não corresponde.");
+            System.err.println("<<<<<Número de colunas e valores não corresponde>>>>>\n");
             return;
         }
 
@@ -45,9 +45,9 @@ public class CRUD {
             }
 
             stmt.executeUpdate();
-            System.out.println("Registro adicionado com sucesso!");
+            System.out.println("<<<<<Registro adicionado com sucesso!>>>>>\n");
         } catch (SQLException e) {
-            System.err.println("Erro ao inserir registro: " + e.getMessage());
+            System.err.println("##### Erro ao inserir registro: " + e.getMessage() + " #####");
         }
     }
 
@@ -67,9 +67,9 @@ public class CRUD {
             stmt.setString(1, valorNovo);
             stmt.setString(2, valorAntigo);
             stmt.executeUpdate();
-            System.out.println("Registro atualizado com sucesso!");
+            System.out.println("<<<<<Registro atualizado com sucesso!>>>>>\n");
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar registro: " + e.getMessage());
+            System.err.println("##### Erro ao atualizar registro: " + e.getMessage() + " #####");
         }
     }
 
@@ -79,7 +79,7 @@ public class CRUD {
      * @param id ID do registro a ser removido
      */
     public void drop(int id) {
-        String colunaId = "id";  // Ajuste este valor conforme a estrutura da tabela
+        String colunaId = "Cliente_ID";  // Ajuste este valor conforme a estrutura da tabela
 
         String sql = "DELETE FROM " + tabela + " WHERE " + colunaId + " = ?";
 
@@ -88,9 +88,9 @@ public class CRUD {
 
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            System.out.println("Registro removido com sucesso!");
+            System.out.println("<<<<<Registro removido com sucesso!>>>>>");
         } catch (SQLException e) {
-            System.err.println("Erro ao remover registro: " + e.getMessage());
+            System.err.println("##### Erro ao remover registro: " + e.getMessage() + " #####");
         }
     }
 
@@ -107,10 +107,15 @@ public class CRUD {
 
             while (rs.next()) {
                 // Ajuste conforme a estrutura da tabela
-                System.out.println("Registro: " + rs.getInt("id") + ", Nome: " + rs.getString("nome"));
+                System.out.println(
+                        "Registro: " + rs.getInt("Cliente_ID")
+                         + ", Nome: " + rs.getString("nome")
+                         + ", Email: " + rs.getString("email")
+                         + ", Telefone: " + rs.getString("telefone")
+                         + ", Cadastro: " + rs.getDate("Data_Cadastro"));
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao selecionar registros: " + e.getMessage());
+            System.err.println("##### Erro ao selecionar registros: " + e.getMessage() + " #####");
         }
     }
 }
