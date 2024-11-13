@@ -3,7 +3,7 @@ create database ecommerce;
 use ecommerce;
 
 create table Clientes (
-	Cliente_ID int unique primary key,
+	Cliente_ID int not null unique auto_increment primary key,
 	Nome varchar(100),
     Email varchar(100),
     Telefone varchar(15),
