@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.util.Scanner;
 import java.sql.Connection;
 import java.util.InputMismatchException;
@@ -14,34 +15,36 @@ public class Main {
 
     // Mapeia opções do menu para nomes de tabelas no banco de dados
     private static final Map<Integer, String> tabelas = Map.of(
-        1, "cliente"
+        1, "clientes"
     );
 
     /**
      * Método principal que inicia o sistema de CRUD.
      * @param args Argumentos de linha de comando (não utilizados)
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Scanner ler = new Scanner(System.in);
         DB conexao = new DB();
         Connection connection = conexao.conectarDB();
 
         if (connection == null) {
-            System.out.println("Falha ao conectar ao banco de dados. O programa será encerrado.");
+            System.out.print("\nFalha ao conectar ao banco de dados. O programa será encerrado.");
             return;
         }
 
         CRUD crud = new CRUD();
 
         while (ligado) {
-            System.out.println("""
+            System.out.print("""
+                    
                     ------ MENU DE OPÇÕES ------
                     1 - ADICIONAR
                     2 - REMOVER
                     3 - EDITAR
-                    4 - SELECIONAR
+                    4 - VISUALIZAR TABELA
                     5 - SAIR
-                    """);
+                    -----------------------------
+                    Digite o número da opção: """);
 
             int opcao;
             try {
@@ -54,13 +57,13 @@ public class Main {
                     case 3 -> editarRegistro(crud, ler);
                     case 4 -> selecionarRegistro(crud, ler);
                     case 5 -> {
-                        System.out.println("Saindo do sistema...");
+                        System.out.print("\nSaindo do sistema...");
                         ligado = false;
                     }
-                    default -> System.out.println("Opção inválida! Tente novamente.");
+                    default -> System.out.println("\nOpção inválida! Tente novamente.\n");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida! Por favor, insira um número.");
+                System.out.println("######## Entrada inválida! Por favor, insira um número. ########\n");
                 ler.nextLine(); // Limpar o buffer
             }
         }
@@ -82,10 +85,12 @@ public class Main {
         String[] colunas = {"Nome", "Email", "Telefone", "Data_Cadastro"};
         String[] valores = new String[colunas.length];
 
+        System.out.println("\n-------- Criando Cadastro --------");
         for (int i = 0; i < colunas.length; i++) {
             System.out.printf("Digite o valor para %s: ", colunas[i]);
             valores[i] = ler.nextLine();
         }
+        System.out.println("\n");
 
         crud.insert(colunas, valores);
     }
@@ -104,7 +109,7 @@ public class Main {
         System.out.println("Qual o ID do valor que você gostaria de remover?");
         int id = ler.nextInt();
         ler.nextLine();
-
+        System.out.println("\n");
         crud.drop(id);
     }
 
@@ -154,14 +159,17 @@ public class Main {
      * @author dimitriKael
      */
     private static String selecionarTabela(Scanner ler) {
-        System.out.println("""
+        System.out.print("""
+                
+                
                 ------ SELECIONAR TABELA ------
                 1 - CLIENTE
-                """);
+                -------------------------------
+                Digite o número da tabela: """);
         
         int opcao = ler.nextInt();
         ler.nextLine(); // Consumir o '\n'
-
+        System.out.println("\n");
         return tabelas.getOrDefault(opcao, null);
     }
 }
