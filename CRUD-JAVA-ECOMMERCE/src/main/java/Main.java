@@ -1,15 +1,30 @@
 import java.util.Scanner;
 import java.sql.Connection;
 import java.util.InputMismatchException;
+import java.util.Map;
 
+/**
+ * Classe principal que executa um sistema de CRUD para uma aplicação de e-commerce.
+ * O sistema permite adicionar, remover, editar e selecionar registros na tabela de clientes.
+ *@author estevaolins
+ */
 public class Main {
 
     static boolean ligado = true;
 
+    // Mapeia opções do menu para nomes de tabelas no banco de dados
+    private static final Map<Integer, String> tabelas = Map.of(
+        1, "cliente"
+    );
+
+    /**
+     * Método principal que inicia o sistema de CRUD.
+     * @param args Argumentos de linha de comando (não utilizados)
+     */
     public static void main(String[] args) {
         Scanner ler = new Scanner(System.in);
-        DB conection = new DB();
-        Connection connection = conection.conectarDB();
+        DB conexao = new DB();
+        Connection connection = conexao.conectarDB();
 
         if (connection == null) {
             System.out.println("Falha ao conectar ao banco de dados. O programa será encerrado.");
@@ -34,24 +49,15 @@ public class Main {
                 ler.nextLine(); // Consumir o '\n'
 
                 switch (opcao) {
-                    case 1: // Adicionar
-                        adicionarRegistro(crud, ler);
-                        break;
-                    case 2: // Remover
-                        removerRegistro(crud, ler);
-                        break;
-                    case 3: // Editar
-                        editarRegistro(crud, ler);
-                        break;
-                    case 4: // Selecionar
-                        selecionarRegistro(crud, ler);
-                        break;
-                    case 5: // Sair
+                    case 1 -> adicionarRegistro(crud, ler);
+                    case 2 -> removerRegistro(crud, ler);
+                    case 3 -> editarRegistro(crud, ler);
+                    case 4 -> selecionarRegistro(crud, ler);
+                    case 5 -> {
                         System.out.println("Saindo do sistema...");
                         ligado = false;
-                        break;
-                    default:
-                        System.out.println("Opção inválida! Tente novamente.");
+                    }
+                    default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida! Por favor, insira um número.");
@@ -62,68 +68,58 @@ public class Main {
         ler.close();
     }
 
+    /**
+     * Adiciona um registro à tabela de clientes no banco de dados.
+     *
+     * @param crud Instância da classe CRUD para realizar operações no banco de dados.
+     * @param ler Scanner para leitura dos valores de entrada do usuário.
+     */
     private static void adicionarRegistro(CRUD crud, Scanner ler) {
-        System.out.println("""
-                ------ ADICIONAR ------
-                QUAL TABELA VOCÊ GOSTARIA DE ADICIONAR INFORMAÇÕES?
-                1 - CLIENTE
-                """);
+        String tabela = selecionarTabela(ler);
+        if (tabela == null) return;
 
-        int opcao = ler.nextInt();
-        ler.nextLine();
-
-        String[] colunas = null;
-        switch (opcao) {
-            case 1:
-                crud.setTabela("cliente");
-                colunas = new String[]{"Nome", "Email", "Telefone", "Data_Cadastro"};
-                break;
-            default:
-                System.out.println("Opção inválida!");
-                return;
-        }
-
+        crud.setTabela(tabela);
+        String[] colunas = {"Nome", "Email", "Telefone", "Data_Cadastro"};
         String[] valores = new String[colunas.length];
-        for (String coluna : colunas) {
-            System.out.printf("Digite o valor para %s: ", coluna);
-            valores[colunas.length] = ler.nextLine();
+
+        for (int i = 0; i < colunas.length; i++) {
+            System.out.printf("Digite o valor para %s: ", colunas[i]);
+            valores[i] = ler.nextLine();
         }
+
         crud.insert(colunas, valores);
     }
 
+    /**
+     * Remove um registro da tabela de clientes no banco de dados.
+     *
+     * @param crud Instância da classe CRUD para realizar operações no banco de dados.
+     * @param ler Scanner para leitura dos valores de entrada do usuário.
+     */
     private static void removerRegistro(CRUD crud, Scanner ler) {
-        System.out.println("Qual tabela você gostaria de remover informações?");
-        System.out.println("""
-                ------ REMOVER ------
-                1 - CLIENTE
-                """);
+        String tabela = selecionarTabela(ler);
+        if (tabela == null) return;
 
-        int idOpcao = ler.nextInt();
+        crud.setTabela(tabela);
         System.out.println("Qual o ID do valor que você gostaria de remover?");
         int id = ler.nextInt();
         ler.nextLine();
 
-        switch (idOpcao) {
-            case 1:
-                crud.setTabela("cliente");
-                break;
-            default:
-                System.out.println("Opção inválida!");
-                return;
-        }
-
         crud.drop(id);
     }
 
+    /**
+     * Edita um atributo de um registro na tabela de clientes no banco de dados.
+     *
+     * @param crud Instância da classe CRUD para realizar operações no banco de dados.
+     * @param ler Scanner para leitura dos valores de entrada do usuário.
+     * @author dimitriKael
+     */
     private static void editarRegistro(CRUD crud, Scanner ler) {
-        System.out.println("Qual tabela você gostaria de editar informações?");
-        System.out.println("""
-                ------ EDITAR ------
-                1 - CLIENTE
-                """);
+        String tabela = selecionarTabela(ler);
+        if (tabela == null) return;
 
-        int editOpcao = ler.nextInt();
-        ler.nextLine();
+        crud.setTabela(tabela);
         System.out.println("Qual o atributo que você gostaria de alterar?");
         String atributo = ler.nextLine();
         System.out.println("Qual o valor antigo que você gostaria de alterar?");
@@ -131,37 +127,41 @@ public class Main {
         System.out.println("Qual o novo valor?");
         String valorNovo = ler.nextLine();
 
-        switch (editOpcao) {
-            case 1:
-                crud.setTabela("cliente");
-                break;
-            default:
-                System.out.println("Opção inválida!");
-                return;
-        }
-
         crud.update(atributo, valorAntigo, valorNovo);
     }
 
+    /**
+     * Exibe os registros de uma tabela específica do banco de dados.
+     *
+     * @param crud Instância da classe CRUD para realizar operações no banco de dados.
+     * @param ler Scanner para leitura dos valores de entrada do usuário.
+     * @author estevaolins
+     */
     private static void selecionarRegistro(CRUD crud, Scanner ler) {
-        System.out.println("Qual tabela você gostaria de selecionar as informações?");
+        String tabela = selecionarTabela(ler);
+        if (tabela == null) return;
+
+        crud.setTabela(tabela);
+        crud.select();
+    }
+
+    /**
+     * Permite ao usuário selecionar uma tabela específica para operações CRUD.
+     * Atualmente, apenas a tabela "cliente" está disponível.
+     *
+     * @param ler Scanner para leitura dos valores de entrada do usuário.
+     * @return O nome da tabela selecionada pelo usuário, ou null se a opção for inválida.
+     * @author dimitriKael
+     */
+    private static String selecionarTabela(Scanner ler) {
         System.out.println("""
-                ------ SELECIONAR ------
+                ------ SELECIONAR TABELA ------
                 1 - CLIENTE
                 """);
+        
+        int opcao = ler.nextInt();
+        ler.nextLine(); // Consumir o '\n'
 
-        int selectOpcao = ler.nextInt();
-        ler.nextLine();
-
-        switch (selectOpcao) {
-            case 1:
-                crud.setTabela("cliente");
-                break;
-            default:
-                System.out.println("Opção inválida!");
-                return;
-        }
-
-        crud.select();
+        return tabelas.getOrDefault(opcao, null);
     }
 }
