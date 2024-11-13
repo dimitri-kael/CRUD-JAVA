@@ -25,3 +25,11 @@
 </div>
 
 ###
+
+<h2 align="left">Integrantes</h2>
+
+###
+
+<p align="left">- Dimitri Kael Pires Vieira<br/>- Estevao Lins Maia</p>
+
+###
